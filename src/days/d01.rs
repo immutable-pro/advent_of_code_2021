@@ -59,13 +59,13 @@ Considering every single measurement isn't as useful as you expected: there's ju
 
 Instead, consider sums of a three-measurement sliding window. Again considering the above example:
 
-199  A      
-200  A B    
-208  A B C  
+199  A
+200  A B
+208  A B C
 210    B C D
 200  E   C D
 207  E F   D
-240  E F G  
+240  E F G
 269    F G H
 260      G H
 263        H
@@ -91,5 +91,47 @@ Consider sums of a three-measurement sliding window. How many sums are larger th
 */
 
 pub fn part2() {
+    let measurements: Vec<i16> = read_file_lines("input/01.txt")
+        .into_iter()
+        .map(|x| x.parse().unwrap())
+        .collect();
 
+    let mut window_1: i16 = 0;
+    let mut window_2: i16 = 0;
+    let mut count: i16 = 0;
+    let mut index: usize = 0;
+
+    for measurement in &measurements {
+        if index < 3 {
+            window_1 += measurement;
+        }
+        if (1..4).contains(&index) {
+            window_2 += measurement;
+        }
+
+        if index < 4 {
+            index += 1;
+            continue;
+        };
+
+        if window_1 < window_2 {
+            count += 1;
+        }
+
+        let window_1_start = measurements[index - 4];
+        let window_2_start = measurements[index - 3];
+        let window_2_end = measurements[index - 1];
+        window_1 -= window_1_start;
+        window_1 += window_2_end;
+        window_2 -= window_2_start;
+        window_2 += measurement;
+
+        index += 1;
+    }
+
+    if window_1 < window_2 {
+        count += 1;
+    }
+
+    println!("Day 01 > Part 2: {}", count);
 }
