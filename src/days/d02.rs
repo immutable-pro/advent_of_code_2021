@@ -40,16 +40,11 @@ pub fn part1() {
 
     read_file_lines("input/02.txt")
         .into_iter()
-        .map(|instruction| {
-            instruction
-                .split_whitespace()
-                .map(|x| x.to_string())
-                .collect()
-        })
-        .for_each(|chunks: Vec<String>| {
-            let instruction = &chunks[0];
-            let amount: i32 = chunks[1].parse().unwrap();
-            match instruction.as_str() {
+        .for_each(|instruction| {
+            let mut chunks = instruction.split_whitespace();
+            let instruction = chunks.next().unwrap();
+            let amount: i32 = chunks.next().unwrap().parse().unwrap();
+            match instruction {
                 "forward" => { hor_pos += amount },
                 "down" => { depth_pos += amount },
                 "up" => { depth_pos -= amount },
@@ -94,16 +89,11 @@ pub fn part2() {
 
     read_file_lines("input/02.txt")
         .into_iter()
-        .map(|instruction| {
-            instruction
-                .split_whitespace()
-                .map(|x| x.to_string())
-                .collect()
-        })
-        .for_each(|chunks: Vec<String>| {
-            let instruction = &chunks[0];
-            let amount: i32 = chunks[1].parse().unwrap();
-            match instruction.as_str() {
+        .for_each(|instruction| {
+            let mut chunks = instruction.split_whitespace();
+            let instruction = chunks.next().unwrap();
+            let amount: i32 = chunks.next().unwrap().parse().unwrap();
+            match instruction {
                 "forward" => { hor_pos += amount; depth_pos += amount * aim },
                 "down" => { aim += amount },
                 "up" => { aim -= amount },
