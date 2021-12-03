@@ -45,9 +45,9 @@ pub fn part1() {
             let instruction = chunks.next().unwrap();
             let amount: i32 = chunks.next().unwrap().parse().unwrap();
             match instruction {
-                "forward" => { hor_pos += amount },
-                "down" => { depth_pos += amount },
-                "up" => { depth_pos -= amount },
+                "forward" => { hor_pos += amount; },
+                "down" => { depth_pos += amount; },
+                "up" => { depth_pos -= amount; },
                 _ => { println!("Weird instruction found") }
             }
         });
@@ -94,9 +94,9 @@ pub fn part2() {
             let instruction = chunks.next().unwrap();
             let amount: i32 = chunks.next().unwrap().parse().unwrap();
             match instruction {
-                "forward" => { hor_pos += amount; depth_pos += amount * aim },
-                "down" => { aim += amount },
-                "up" => { aim -= amount },
+                "forward" => { hor_pos += amount; depth_pos += amount * aim; },
+                "down" => { aim += amount; },
+                "up" => { aim -= amount; },
                 _ => { println!("Weird instruction found") }
             }
         });
