@@ -39,7 +39,6 @@ pub fn part1() {
     let mut depth_pos: i32 = 0;
 
     read_file_lines("input/02.txt")
-        .into_iter()
         .for_each(|instruction| {
             let mut chunks = instruction.split_whitespace();
             let instruction = chunks.next().unwrap();
@@ -88,7 +87,6 @@ pub fn part2() {
     let mut aim: i32 = 0;
 
     read_file_lines("input/02.txt")
-        .into_iter()
         .for_each(|instruction| {
             let mut chunks = instruction.split_whitespace();
             let instruction = chunks.next().unwrap();

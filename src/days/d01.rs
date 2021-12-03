@@ -41,7 +41,6 @@ How many measurements are larger than the previous measurement?
 pub fn part1() {
     let mut prev: i16 = i16::MAX;
     let count = read_file_lines("input/01.txt")
-        .into_iter()
         .fold(0, |count, measurement_str| {
             let measurement = measurement_str.parse().unwrap();
             let increase = measurement > prev;
@@ -94,7 +93,6 @@ Consider sums of a three-measurement sliding window. How many sums are larger th
 
 pub fn part2() {
     let measurements: Vec<i16> = read_file_lines("input/01.txt")
-        .into_iter()
         .map(|x| x.parse().unwrap())
         .collect();
 
