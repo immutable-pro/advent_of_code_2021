@@ -39,17 +39,19 @@ How many measurements are larger than the previous measurement?
 */
 
 pub fn part1() {
-    let measurements = read_file_lines("input/01.txt");
-
     let mut prev: i16 = i16::MAX;
-    let mut count: i16 = 0;
-    for measurement_str in &measurements {
-        let measurement = measurement_str.parse().unwrap();
-        if measurement > prev {
-            count += 1;
-        }
-        prev = measurement;
-    }
+    let count = read_file_lines("input/01.txt")
+        .into_iter()
+        .fold(0, |count, measurement_str| {
+            let measurement = measurement_str.parse().unwrap();
+            let increase = measurement > prev;
+            prev = measurement;
+            if increase {
+                count + 1
+            } else {
+                count
+            }
+        });
 
     println!("Day 01 > Part 1: {}", count);
 }
