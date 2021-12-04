@@ -49,8 +49,12 @@ pub fn part1() {
 
     let mut gamma_rate = 0;
     let mut epsilon_rate = 0;
-    for i in 0..binary_len {
-        let most_common = if binaries_len - ones_count[i] > binaries_len/2 { 0 } else { 1 };
+    for (i, count) in ones_count.iter().enumerate() {
+        let most_common = if binaries_len - count > binaries_len / 2 {
+            0
+        } else {
+            1
+        };
         let least_common = if most_common == 0 { 1 } else { 0 };
         gamma_rate += most_common << (binary_len - i - 1);
         epsilon_rate += least_common << (binary_len - i - 1);
@@ -94,4 +98,57 @@ Finally, to find the life support rating, multiply the oxygen generator rating (
 Use the binary numbers in your diagnostic report to calculate the oxygen generator rating and CO2 scrubber rating, then multiply them together. What is the life support rating of the submarine? (Be sure to represent your answer in decimal, not binary.)
 */
 
-pub fn part2() {}
+fn sweep<'a>(binaries: &[&'a String], pos: usize, use_ones: bool) -> Vec<&'a String> {
+    let binaries_len = binaries.len();
+    let mut ones_count = 0;
+
+    binaries.iter().for_each(|binary| {
+        let c: char = binary.chars().collect::<Vec<char>>()[pos];
+        ones_count += if c == '0' { 0 } else { 1 };
+    });
+
+    let most_common = if binaries_len - ones_count > binaries_len / 2 {
+        if use_ones {
+            '0'
+        } else {
+            '1'
+        }
+    } else if use_ones {
+        '1'
+    } else {
+        '0'
+    };
+
+    binaries
+        .iter()
+        .filter(|binary| binary.chars().collect::<Vec<char>>()[pos] == most_common)
+        .copied()
+        .collect()
+}
+
+fn reduce(binaries: &[&String], uses_ones: bool) -> i32 {
+    let binary_len = binaries[0].len();
+    let mut index = 0;
+    let mut swept: Vec<&String> = binaries.iter().copied().collect();
+    loop {
+        swept = sweep(&swept, index, uses_ones);
+        if swept.len() == 1 {
+            break;
+        }
+        index += 1;
+    }
+
+    swept[0].chars().enumerate().fold(0, |acc, (i, c)| {
+        acc + (c.to_string().parse::<i32>().unwrap() << (binary_len - i - 1))
+    })
+}
+
+pub fn part2() {
+    let data: Vec<String> = read_file_lines("input/03.txt").collect();
+    let binaries: Vec<&String> = data.iter().collect();
+
+    let oxygen_rate = reduce(&binaries, true);
+    let c02_scrubber = reduce(&binaries, false);
+
+    println!("Day 03 > Part 2: {}", c02_scrubber * oxygen_rate);
+}
