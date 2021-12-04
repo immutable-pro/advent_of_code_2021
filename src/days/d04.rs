@@ -100,7 +100,7 @@ fn calculate_result(board: &Board) -> i32 {
     board.unmarked.iter().sum()
 }
 
-pub fn part1() {
+fn parse_bingo() -> (Vec<i32>, Vec<Board>) {
     let mut bingo = read_file_lines("input/04.txt");
     let random_numbers: Vec<i32> = bingo
         .next()
@@ -128,6 +128,11 @@ pub fn part1() {
             i += 1;
         }
     }
+    (random_numbers, boards)
+}
+
+pub fn part1() {
+    let (random_numbers, mut boards) = parse_bingo();
 
     let mut result: i32 = -1;
     let mut done = false;
@@ -162,35 +167,9 @@ In the above example, the second board is the last to win, which happens after 1
 Figure out which board will win last. Once it wins, what would its final score be?
 */
 pub fn part2() {
-    let mut bingo = read_file_lines("input/04.txt");
-    let random_numbers: Vec<i32> = bingo
-        .next()
-        .unwrap()
-        .split(',')
-        .map(|x| x.parse().unwrap())
-        .collect();
-    let mut boards: Vec<Board> = Vec::new();
+    let (random_numbers, mut boards) = parse_bingo();
+
     let mut winning_boards: HashSet<usize> = HashSet::new();
-
-    let mut i: usize = 0;
-    for line in bingo {
-        let numbers = line_to_numbers(&line);
-        if numbers.is_empty() {
-            boards.push(Board {
-                hits: Vec::new(),
-                unmarked: HashSet::new(),
-                numbers: HashMap::new(),
-            });
-            i = 0;
-        } else {
-            numbers.into_iter().enumerate().for_each(|(j, number)| {
-                boards.last_mut().unwrap().numbers.insert(number, (i, j));
-                boards.last_mut().unwrap().unmarked.insert(number);
-            });
-            i += 1;
-        }
-    }
-
     let mut last_won: usize = usize::MAX;
     let mut last_won_number: i32 = -1;
     for number in &random_numbers {
