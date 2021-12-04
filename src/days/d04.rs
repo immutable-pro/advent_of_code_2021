@@ -64,7 +64,7 @@ To guarantee victory against the giant squid, figure out which board will win fi
 
 const SIZE: usize = 5;
 
-struct Card {
+struct Board {
     hits: Vec<i32>,
     unmarked: HashSet<i32>,
     numbers: HashMap<i32, (usize, usize)>,
@@ -80,12 +80,12 @@ fn line_to_numbers(line: &str) -> Vec<i32> {
     }
 }
 
-fn check_for_lines(card: &Card, number: &i32) -> bool {
-    let (i, j) = card.numbers.get(number).unwrap();
+fn check_for_lines(board: &Board, number: &i32) -> bool {
+    let (i, j) = board.numbers.get(number).unwrap();
     let mut same_row_found = 0;
     let mut same_column_found = 0;
-    for number in &card.hits {
-        let (hit_i, hit_j) = card.numbers.get(number).unwrap();
+    for number in &board.hits {
+        let (hit_i, hit_j) = board.numbers.get(number).unwrap();
         if hit_i == i {
             same_row_found += 1;
         }
@@ -96,8 +96,8 @@ fn check_for_lines(card: &Card, number: &i32) -> bool {
     same_row_found == SIZE || same_column_found == SIZE
 }
 
-fn calculate_result(card: &Card) -> i32 {
-    card.unmarked.iter().sum()
+fn calculate_result(board: &Board) -> i32 {
+    board.unmarked.iter().sum()
 }
 
 pub fn part1() {
@@ -108,13 +108,13 @@ pub fn part1() {
         .split(',')
         .map(|x| x.parse().unwrap())
         .collect();
-    let mut cards: Vec<Card> = Vec::new();
+    let mut board: Vec<Board> = Vec::new();
 
     let mut i: usize = 0;
     for line in bingo {
         let numbers = line_to_numbers(&line);
         if numbers.is_empty() {
-            cards.push(Card {
+            board.push(Board {
                 hits: Vec::new(),
                 unmarked: HashSet::new(),
                 numbers: HashMap::new(),
@@ -122,8 +122,8 @@ pub fn part1() {
             i = 0;
         } else {
             numbers.into_iter().enumerate().for_each(|(j, number)| {
-                cards.last_mut().unwrap().numbers.insert(number, (i, j));
-                cards.last_mut().unwrap().unmarked.insert(number);
+                board.last_mut().unwrap().numbers.insert(number, (i, j));
+                board.last_mut().unwrap().unmarked.insert(number);
             });
             i += 1;
         }
@@ -136,20 +136,30 @@ pub fn part1() {
             break;
         }
 
-        for card in &mut cards {
-            if card.numbers.contains_key(number) {
-                card.hits.push(*number);
-                card.unmarked.remove(number);
+        for board in &mut board {
+            if board.numbers.contains_key(number) {
+                board.hits.push(*number);
+                board.unmarked.remove(number);
 
-                if card.hits.len() >= 5 && check_for_lines(card, number) {
-                    result = calculate_result(card) * number;
+                if board.hits.len() >= 5 && check_for_lines(board, number) {
+                    result = calculate_result(board) * number;
                     done = true;
                     break;
                 }
             }
         }
     }
-    println!("Day 03 > Part 1: {}", result);
+    println!("Day 04 > Part 1: {}", result);
 }
 
-pub fn part2() {}
+/*
+On the other hand, it might be wise to try a different strategy: let the giant squid win.
+
+You aren't sure how many bingo boards a giant squid could play at once, so rather than waste time counting its arms, the safe thing to do is to figure out which board will win last and choose that one. That way, no matter which boards it picks, it will win for sure.
+
+In the above example, the second board is the last to win, which happens after 13 is eventually called and its middle column is completely marked. If you were to keep playing until this point, the second board would have a sum of unmarked numbers equal to 148 for a final score of 148 * 13 = 1924.
+
+Figure out which board will win last. Once it wins, what would its final score be?
+*/
+pub fn part2() {
+}
