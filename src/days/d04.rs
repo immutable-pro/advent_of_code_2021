@@ -108,13 +108,13 @@ pub fn part1() {
         .split(',')
         .map(|x| x.parse().unwrap())
         .collect();
-    let mut board: Vec<Board> = Vec::new();
+    let mut boards: Vec<Board> = Vec::new();
 
     let mut i: usize = 0;
     for line in bingo {
         let numbers = line_to_numbers(&line);
         if numbers.is_empty() {
-            board.push(Board {
+            boards.push(Board {
                 hits: Vec::new(),
                 unmarked: HashSet::new(),
                 numbers: HashMap::new(),
@@ -122,8 +122,8 @@ pub fn part1() {
             i = 0;
         } else {
             numbers.into_iter().enumerate().for_each(|(j, number)| {
-                board.last_mut().unwrap().numbers.insert(number, (i, j));
-                board.last_mut().unwrap().unmarked.insert(number);
+                boards.last_mut().unwrap().numbers.insert(number, (i, j));
+                boards.last_mut().unwrap().unmarked.insert(number);
             });
             i += 1;
         }
@@ -136,7 +136,7 @@ pub fn part1() {
             break;
         }
 
-        for board in &mut board {
+        for board in &mut boards {
             if board.numbers.contains_key(number) {
                 board.hits.push(*number);
                 board.unmarked.remove(number);
@@ -162,4 +162,51 @@ In the above example, the second board is the last to win, which happens after 1
 Figure out which board will win last. Once it wins, what would its final score be?
 */
 pub fn part2() {
+    let mut bingo = read_file_lines("input/04.txt");
+    let random_numbers: Vec<i32> = bingo
+        .next()
+        .unwrap()
+        .split(',')
+        .map(|x| x.parse().unwrap())
+        .collect();
+    let mut boards: Vec<Board> = Vec::new();
+    let mut winning_boards: HashSet<usize> = HashSet::new();
+
+    let mut i: usize = 0;
+    for line in bingo {
+        let numbers = line_to_numbers(&line);
+        if numbers.is_empty() {
+            boards.push(Board {
+                hits: Vec::new(),
+                unmarked: HashSet::new(),
+                numbers: HashMap::new(),
+            });
+            i = 0;
+        } else {
+            numbers.into_iter().enumerate().for_each(|(j, number)| {
+                boards.last_mut().unwrap().numbers.insert(number, (i, j));
+                boards.last_mut().unwrap().unmarked.insert(number);
+            });
+            i += 1;
+        }
+    }
+
+    let mut last_won: usize = usize::MAX;
+    let mut last_won_number: i32 = -1;
+    for number in &random_numbers {
+        for (idx, board) in boards.iter_mut().enumerate() {
+            if !winning_boards.contains(&idx) && board.numbers.contains_key(number) {
+                board.hits.push(*number);
+                board.unmarked.remove(number);
+
+                if board.hits.len() >= 5 && check_for_lines(board, number) {
+                    last_won = idx;
+                    last_won_number = *number;
+                    winning_boards.insert(idx);
+                }
+            }
+        }
+    }
+
+    println!("Day 04 > Part 2: {}", calculate_result(&boards[last_won]) * last_won_number);
 }
