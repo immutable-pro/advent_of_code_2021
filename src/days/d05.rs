@@ -47,8 +47,7 @@ fn add_point(points: &mut HashMap<(i16, i16), i16>, (x, y): (i16, i16)) {
     *points.entry((x, y)).or_insert(0) += 1;
 }
 
-pub fn part1() {
-    let mut points: HashMap<(i16, i16), i16> = HashMap::new();
+fn parse_coords() -> std::vec::IntoIter<(i16, i16, i16, i16)> {
     read_file_lines("input/05.txt")
         .map(|line| {
             let mut parts = line.split(" -> ");
@@ -66,6 +65,13 @@ pub fn part1() {
                 .collect();
             (coords_1[0], coords_1[1], coords_2[0], coords_2[1])
         })
+        .collect::<Vec<(i16, i16, i16, i16)>>()
+        .into_iter()
+}
+
+pub fn part1() {
+    let mut points: HashMap<(i16, i16), i16> = HashMap::new();
+    parse_coords()
         .filter(|(x1, y1, x2, y2)| x1 == x2 || y1 == y2)
         .for_each(|(x1, y1, x2, y2)| {
             if x1 == x2 {
@@ -115,47 +121,30 @@ Consider all of the lines. At how many points do at least two lines overlap?
 
 pub fn part2() {
     let mut points: HashMap<(i16, i16), i16> = HashMap::new();
-    read_file_lines("input/05.txt")
-        .map(|line| {
-            let mut parts = line.split(" -> ");
-            let coords_1: Vec<i16> = parts
-                .next()
-                .unwrap()
-                .split(',')
-                .map(|x| x.parse().unwrap())
-                .collect();
-            let coords_2: Vec<i16> = parts
-                .next()
-                .unwrap()
-                .split(',')
-                .map(|x| x.parse().unwrap())
-                .collect();
-            (coords_1[0], coords_1[1], coords_2[0], coords_2[1])
-        })
-        .for_each(|(x1, y1, x2, y2)| {
-            if x1 == x2 {
-                let range = if y1 < y2 { y1..(y2 + 1) } else { y2..(y1 + 1) };
-                for i in range {
-                    add_point(&mut points, (x1, i));
-                }
-            } else if y1 == y2 {
-                let range = if x1 < x2 { x1..(x2 + 1) } else { x2..(x1 + 1) };
-                for i in range {
-                    add_point(&mut points, (i, y1));
-                }
-            } else {
-                add_point(&mut points, (x1, y1));
-                let step_x = if x1 < x2 { 1 } else { -1 };
-                let step_y = if y1 < y2 { 1 } else { -1 };
-                let mut x = x1;
-                let mut y = y1;
-                while x != x2 && y != y2 {
-                    x += step_x;
-                    y += step_y;
-                    add_point(&mut points, (x, y));
-                }
+    parse_coords().for_each(|(x1, y1, x2, y2)| {
+        if x1 == x2 {
+            let range = if y1 < y2 { y1..(y2 + 1) } else { y2..(y1 + 1) };
+            for i in range {
+                add_point(&mut points, (x1, i));
             }
-        });
+        } else if y1 == y2 {
+            let range = if x1 < x2 { x1..(x2 + 1) } else { x2..(x1 + 1) };
+            for i in range {
+                add_point(&mut points, (i, y1));
+            }
+        } else {
+            add_point(&mut points, (x1, y1));
+            let step_x = if x1 < x2 { 1 } else { -1 };
+            let step_y = if y1 < y2 { 1 } else { -1 };
+            let mut x = x1;
+            let mut y = y1;
+            while x != x2 && y != y2 {
+                x += step_x;
+                y += step_y;
+                add_point(&mut points, (x, y));
+            }
+        }
+    });
 
     let result = points
         .values()
