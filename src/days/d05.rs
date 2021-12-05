@@ -79,7 +79,7 @@ pub fn part1() {
                 for i in range {
                     add_point(&mut points, (x1, i));
                 }
-            } else if y1 == y2 {
+            } else {
                 let range = if x1 < x2 { x1..(x2 + 1) } else { x2..(x1 + 1) };
                 for i in range {
                     add_point(&mut points, (i, y1));
