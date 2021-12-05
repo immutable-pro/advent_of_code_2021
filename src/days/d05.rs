@@ -43,26 +43,28 @@ To avoid the most dangerous areas, you need to determine the number of points wh
 
 Consider only horizontal and vertical lines. At how many points do at least two lines overlap?
 */
-fn add_point(points: &mut HashMap<(usize, usize), i16>, (x, y): (usize, usize)) {
+fn add_point(points: &mut HashMap<(i16, i16), i16>, (x, y): (i16, i16)) {
     let point = points.get_mut(&(x, y));
     match point {
         Some(count) => *count += 1,
-        None => { points.insert((x, y), 1); }
+        None => {
+            points.insert((x, y), 1);
+        }
     }
 }
 
 pub fn part1() {
-    let mut points: HashMap<(usize, usize), i16> = HashMap::new();
+    let mut points: HashMap<(i16, i16), i16> = HashMap::new();
     read_file_lines("input/05.txt")
         .map(|line| {
             let mut parts = line.split(" -> ");
-            let coords_1: Vec<usize> = parts
+            let coords_1: Vec<i16> = parts
                 .next()
                 .unwrap()
                 .split(',')
                 .map(|x| x.parse().unwrap())
                 .collect();
-            let coords_2: Vec<usize> = parts
+            let coords_2: Vec<i16> = parts
                 .next()
                 .unwrap()
                 .split(',')
@@ -78,15 +80,91 @@ pub fn part1() {
                     add_point(&mut points, (x1, i));
                 }
             } else if y1 == y2 {
-                let range = if x1 < x2 { x1..(x2+1) } else { x2..(x1 + 1) };
+                let range = if x1 < x2 { x1..(x2 + 1) } else { x2..(x1 + 1) };
                 for i in range {
                     add_point(&mut points, (i, y1));
                 }
             }
         });
 
-        let result = points.values().fold(0, |acc, x| if *x >= 2 { acc + 1 } else { acc } );
-        println!("Day 05 > Part 1: {}", result); 
+    let result = points
+        .values()
+        .fold(0, |acc, x| if *x >= 2 { acc + 1 } else { acc });
+    println!("Day 05 > Part 1: {}", result);
 }
 
-pub fn part2() {}
+/*
+Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need to also consider diagonal lines.
+
+Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
+
+    An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
+    An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
+
+Considering all lines from the above example would now produce the following diagram:
+
+1.1....11.
+.111...2..
+..2.1.111.
+...1.2.2..
+.112313211
+...1.2....
+..1...1...
+.1.....1..
+1.......1.
+222111....
+
+You still need to determine the number of points where at least two lines overlap. In the above example, this is still anywhere in the diagram with a 2 or larger - now a total of 12 points.
+
+Consider all of the lines. At how many points do at least two lines overlap?
+*/
+
+pub fn part2() {
+    let mut points: HashMap<(i16, i16), i16> = HashMap::new();
+    read_file_lines("input/05.txt")
+        .map(|line| {
+            let mut parts = line.split(" -> ");
+            let coords_1: Vec<i16> = parts
+                .next()
+                .unwrap()
+                .split(',')
+                .map(|x| x.parse().unwrap())
+                .collect();
+            let coords_2: Vec<i16> = parts
+                .next()
+                .unwrap()
+                .split(',')
+                .map(|x| x.parse().unwrap())
+                .collect();
+            (coords_1[0], coords_1[1], coords_2[0], coords_2[1])
+        })
+        .for_each(|(x1, y1, x2, y2)| {
+            if x1 == x2 {
+                let range = if y1 < y2 { y1..(y2 + 1) } else { y2..(y1 + 1) };
+                for i in range {
+                    add_point(&mut points, (x1, i));
+                }
+            } else if y1 == y2 {
+                let range = if x1 < x2 { x1..(x2 + 1) } else { x2..(x1 + 1) };
+                for i in range {
+                    add_point(&mut points, (i, y1));
+                }
+            } else {
+                add_point(&mut points, (x1, y1));
+                let step_x = if x1 < x2 { 1 } else { -1 };
+                let step_y = if y1 < y2 { 1 } else { -1 };
+                let mut x = x1;
+                let mut y = y1;
+                while x != x2 && y != y2 {
+                    x += step_x;
+                    y += step_y;
+                    add_point(&mut points, (x, y));
+                }
+            }
+        });
+
+    let result = points
+        .values()
+        .fold(0, |acc, x| if *x >= 2 { acc + 1 } else { acc });
+    println!("Day 05 > Part 2: {}", result);
+}
