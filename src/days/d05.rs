@@ -44,13 +44,7 @@ To avoid the most dangerous areas, you need to determine the number of points wh
 Consider only horizontal and vertical lines. At how many points do at least two lines overlap?
 */
 fn add_point(points: &mut HashMap<(i16, i16), i16>, (x, y): (i16, i16)) {
-    let point = points.get_mut(&(x, y));
-    match point {
-        Some(count) => *count += 1,
-        None => {
-            points.insert((x, y), 1);
-        }
-    }
+    *points.entry((x, y)).or_insert(0) += 1;
 }
 
 pub fn part1() {
