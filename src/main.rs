@@ -9,6 +9,8 @@ fn main() {
     // d03::part2();
     // d04::part1();
     // d04::part2();
-    d05::part1();
-    d05::part2();
+    // d05::part1();
+    // d05::part2();
+    d06::part1();
+    d06::part2();
 }
