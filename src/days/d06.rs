@@ -53,42 +53,6 @@ In this example, after 18 days, there are a total of 26 fish. After 80 days, the
 
 Find a way to simulate lanternfish. How many lanternfish would there be after 80 days?
 */
-pub fn part1() {
-    let lanterfish: Vec<i8> = read_file_lines("input/06.txt")
-        .next()
-        .unwrap()
-        .split(',')
-        .map(|x| x.parse().unwrap())
-        .collect();
-
-    let mut next_gen = lanterfish;
-    for _ in 0..80 {
-        let mut new_fish = 0;
-        next_gen = next_gen
-            .iter()
-            .map(|x| {
-                if *x == 0 {
-                    new_fish += 1;
-                    6
-                } else {
-                    *x - 1
-                }
-            })
-            .collect::<Vec<i8>>();
-
-        next_gen.resize(next_gen.len() + new_fish, 8);
-    }
-    println!("Day 06 > Part 1: {}", next_gen.len());
-}
-
-/*
-Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
-3
-After 256 days in the example above, there would be a total of 26984457539 lanternfish!
-
-How many lanternfish would there be after 256 days?
-*/
-
 fn generate_fishes(days: i64) -> i64 {
     if days > 0 {
         days / 7
@@ -111,21 +75,49 @@ fn deep_gen(fish: i64, days: i64) -> i64 {
     total
 }
 
-pub fn count_fish_generations(timer: i64) -> i64 {
+pub fn count_fish_generations(timer: i64, days: i64) -> i64 {
     let mut total = 1;
-    let generated_fishes = generate_fishes(256 - timer - 1) + 1;
+    let generated_fishes = generate_fishes(days - timer - 1) + 1;
     total += generated_fishes;
-    total += deep_gen(generated_fishes, 256 - timer - 1);
+    total += deep_gen(generated_fishes, days - timer - 1);
     total
 }
 
-pub fn part2() {
+pub fn part1() {
+    let days = 80;
     let gens = [
-        count_fish_generations(1),
-        count_fish_generations(2),
-        count_fish_generations(3),
-        count_fish_generations(4),
-        count_fish_generations(5),
+        count_fish_generations(1, days),
+        count_fish_generations(2, days),
+        count_fish_generations(3, days),
+        count_fish_generations(4, days),
+        count_fish_generations(5, days),
+    ];
+
+    let fish = read_file_lines("input/06.txt")
+        .next()
+        .unwrap()
+        .split(',')
+        .map(|timer_str| gens[(timer_str.parse::<i64>().unwrap() - 1) as usize])
+        .collect::<Vec<i64>>();
+    println!("Day 06 > Part 1: {}", fish.iter().sum::<i64>());
+}
+
+/*
+Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
+3
+After 256 days in the example above, there would be a total of 26984457539 lanternfish!
+
+How many lanternfish would there be after 256 days?
+*/
+
+pub fn part2() {
+    let days = 256;
+    let gens = [
+        count_fish_generations(1, days),
+        count_fish_generations(2, days),
+        count_fish_generations(3, days),
+        count_fish_generations(4, days),
+        count_fish_generations(5, days),
     ];
 
     let fish = read_file_lines("input/06.txt")
