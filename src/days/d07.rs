@@ -1,6 +1,4 @@
 use crate::utils::read_file_lines;
-use std::cmp::max;
-use std::cmp::min;
 
 /*
 A giant whale has decided your submarine is its next meal, and it's much faster than you are. There's nowhere to run!
@@ -78,28 +76,23 @@ Determine the horizontal position that the crabs can align to using the least fu
 */
 
 pub fn part2() {
-    let mut positions_num: i32 = i32::MIN;
+    let mut positions_sum: i32 = 0;
     let crabs_positions = read_file_lines("input/07.txt")
         .next()
         .unwrap()
         .split(',')
         .map(|x| {
             let val = x.parse().unwrap();
-            positions_num = max(positions_num, val);
+            positions_sum += val;
             val
         })
         .collect::<Vec<i32>>();
+    let avg: i32 = positions_sum / crabs_positions.len() as i32;
 
+    let total_fuel = crabs_positions.iter().fold(0, |acc, crab_pos| {
+        let steps = i32::abs(crab_pos - avg);
+        acc + (steps * (steps + 1) / 2)
+    });
 
-    let mut min_fuel: i32 = i32::MAX;
-    for pos in 0..positions_num + 1 {
-        let total_fuel_pos = crabs_positions.iter().fold(0, |acc, crab_pos| {
-            let steps = i32::abs(crab_pos - pos);
-            let fuel = steps * (steps + 1) / 2;
-            acc + fuel
-        });
-        min_fuel = min(total_fuel_pos, min_fuel);
-    }
-
-    println!("Day 07 > Part 2: {}", min_fuel);
+    println!("Day 07 > Part 2: {}", total_fuel);
 }
