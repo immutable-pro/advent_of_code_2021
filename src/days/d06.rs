@@ -62,9 +62,9 @@ fn generate_fishes(days: i64) -> i64 {
     }
 }
 
-fn deep_gen(fish: i64, days: i64, visited: &mut HashMap<(i64, i64), i64>) -> i64 {
-    if visited.contains_key(&(fish, days)) {
-        *visited.get(&(fish, days)).unwrap()
+fn deep_gen(fish: i64, days: i64, memo: &mut HashMap<(i64, i64), i64>) -> i64 {
+    if memo.contains_key(&(fish, days)) {
+        *memo.get(&(fish, days)).unwrap()
     } else {
         let mut total = 0;
         for i in 0..fish {
@@ -72,11 +72,11 @@ fn deep_gen(fish: i64, days: i64, visited: &mut HashMap<(i64, i64), i64>) -> i64
             if remaining_days >= 0 {
                 let gen = generate_fishes(remaining_days) + 1;
                 if gen > 0 {
-                    total += gen + deep_gen(gen, remaining_days, visited);
+                    total += gen + deep_gen(gen, remaining_days, memo);
                 }
             }
         }
-        visited.insert((fish, days), total);
+        memo.insert((fish, days), total);
         total
     }
 }
@@ -84,24 +84,24 @@ fn deep_gen(fish: i64, days: i64, visited: &mut HashMap<(i64, i64), i64>) -> i64
 pub fn count_fish_generations(
     timer: i64,
     days: i64,
-    visited: &mut HashMap<(i64, i64), i64>,
+    memo: &mut HashMap<(i64, i64), i64>,
 ) -> i64 {
     let mut total = 1;
     let generated_fishes = generate_fishes(days - timer - 1) + 1;
     total += generated_fishes;
-    total += deep_gen(generated_fishes, days - timer - 1, visited);
+    total += deep_gen(generated_fishes, days - timer - 1, memo);
     total
 }
 
 pub fn part1() {
     let days = 80;
-    let mut visited: HashMap<(i64, i64), i64> = HashMap::new();
+    let mut memo: HashMap<(i64, i64), i64> = HashMap::new();
     let gens = [
-        count_fish_generations(1, days, &mut visited),
-        count_fish_generations(2, days, &mut visited),
-        count_fish_generations(3, days, &mut visited),
-        count_fish_generations(4, days, &mut visited),
-        count_fish_generations(5, days, &mut visited),
+        count_fish_generations(1, days, &mut memo),
+        count_fish_generations(2, days, &mut memo),
+        count_fish_generations(3, days, &mut memo),
+        count_fish_generations(4, days, &mut memo),
+        count_fish_generations(5, days, &mut memo),
     ];
 
     let fish = read_file_lines("input/06.txt")
@@ -123,13 +123,13 @@ How many lanternfish would there be after 256 days?
 
 pub fn part2() {
     let days = 256;
-    let mut visited: HashMap<(i64, i64), i64> = HashMap::new();
+    let mut memo: HashMap<(i64, i64), i64> = HashMap::new();
     let gens = [
-        count_fish_generations(1, days, &mut visited),
-        count_fish_generations(2, days, &mut visited),
-        count_fish_generations(3, days, &mut visited),
-        count_fish_generations(4, days, &mut visited),
-        count_fish_generations(5, days, &mut visited),
+        count_fish_generations(1, days, &mut memo),
+        count_fish_generations(2, days, &mut memo),
+        count_fish_generations(3, days, &mut memo),
+        count_fish_generations(4, days, &mut memo),
+        count_fish_generations(5, days, &mut memo),
     ];
 
     let fish = read_file_lines("input/06.txt")
