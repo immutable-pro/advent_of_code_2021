@@ -7,21 +7,17 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'advent_of_code_2021'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--lib",
-                    "--package=advent_of_code_2021"
-                ],
-                "filter": {
-                    "name": "advent_of_code_2021",
-                    "kind": "lib"
-                }
-            },
+            "name": "Debug",
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "program": "${workspaceFolder}/target/debug/advent_of_code_2021",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "sourceLanguages": [
+                "rust"
+            ],
+            "sourceMap": {
+                "/rustc/*": "${env:HOME}/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust"
+            }
         },
         {
             "type": "lldb",
@@ -41,24 +37,5 @@
             "args": [],
             "cwd": "${workspaceFolder}"
         },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'advent_of_code_2021'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=advent_of_code_2021",
-                    "--package=advent_of_code_2021"
-                ],
-                "filter": {
-                    "name": "advent_of_code_2021",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        }
     ]
 }
