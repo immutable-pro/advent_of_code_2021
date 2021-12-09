@@ -13,6 +13,8 @@ fn main() {
     // d05::part2();
     // d06::part1();
     // d06::part2();
-    d07::part1();
-    d07::part2();
+    // d07::part1();
+    // d07::part2();
+    d08::part1();
+    d08::part2();
 }
