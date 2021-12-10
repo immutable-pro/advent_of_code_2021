@@ -49,6 +49,7 @@ fn add_point(points: &mut HashMap<(i16, i16), i16>, (x, y): (i16, i16)) {
 
 fn parse_coords() -> std::vec::IntoIter<(i16, i16, i16, i16)> {
     read_file_lines("input/05.txt")
+        .iter()
         .map(|line| {
             let mut parts = line.split(" -> ");
             let coords_1: Vec<i16> = parts

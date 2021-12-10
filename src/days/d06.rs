@@ -64,7 +64,7 @@ fn generate_fishes(days: i64) -> i64 {
 
 fn deep_gen(fish: i64, days: i64, memo: &mut HashMap<(i64, i64), i64>) -> i64 {
     if memo.contains_key(&(fish, days)) {
-        *memo.get(&(fish, days)).unwrap()
+        memo[&(fish, days)]
     } else {
         let mut total = 0;
         for i in 0..fish {
@@ -81,11 +81,7 @@ fn deep_gen(fish: i64, days: i64, memo: &mut HashMap<(i64, i64), i64>) -> i64 {
     }
 }
 
-pub fn count_fish_generations(
-    timer: i64,
-    days: i64,
-    memo: &mut HashMap<(i64, i64), i64>,
-) -> i64 {
+pub fn count_fish_generations(timer: i64, days: i64, memo: &mut HashMap<(i64, i64), i64>) -> i64 {
     let mut total = 1;
     let generated_fishes = generate_fishes(days - timer - 1) + 1;
     total += generated_fishes;
@@ -104,9 +100,7 @@ pub fn part1() {
         count_fish_generations(5, days, &mut memo),
     ];
 
-    let fish = read_file_lines("input/06.txt")
-        .next()
-        .unwrap()
+    let fish = read_file_lines("input/06.txt")[0]
         .split(',')
         .map(|timer_str| gens[(timer_str.parse::<i64>().unwrap() - 1) as usize])
         .collect::<Vec<i64>>();
@@ -132,9 +126,7 @@ pub fn part2() {
         count_fish_generations(5, days, &mut memo),
     ];
 
-    let fish = read_file_lines("input/06.txt")
-        .next()
-        .unwrap()
+    let fish = read_file_lines("input/06.txt")[0]
         .split(',')
         .map(|timer_str| gens[(timer_str.parse::<i64>().unwrap() - 1) as usize])
         .collect::<Vec<i64>>();

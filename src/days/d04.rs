@@ -81,11 +81,11 @@ fn line_to_numbers(line: &str) -> Vec<i32> {
 }
 
 fn check_for_lines(board: &Board, number: &i32) -> bool {
-    let (i, j) = board.numbers.get(number).unwrap();
+    let (i, j) = board.numbers[number];
     let mut same_row_found = 0;
     let mut same_column_found = 0;
     for number in &board.hits {
-        let (hit_i, hit_j) = board.numbers.get(number).unwrap();
+        let (hit_i, hit_j) = board.numbers[number];
         if hit_i == i {
             same_row_found += 1;
         }
@@ -101,7 +101,7 @@ fn calculate_result(board: &Board) -> i32 {
 }
 
 fn parse_bingo() -> (Vec<i32>, Vec<Board>) {
-    let mut bingo = read_file_lines("input/04.txt");
+    let mut bingo = read_file_lines("input/04.txt").into_iter();
     let random_numbers: Vec<i32> = bingo
         .next()
         .unwrap()
@@ -187,5 +187,8 @@ pub fn part2() {
         }
     }
 
-    println!("Day 04 > Part 2: {}", calculate_result(&boards[last_won]) * last_won_number);
+    println!(
+        "Day 04 > Part 2: {}",
+        calculate_result(&boards[last_won]) * last_won_number
+    );
 }

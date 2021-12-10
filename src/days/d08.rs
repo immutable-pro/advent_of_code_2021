@@ -74,6 +74,7 @@ In the output values, how many times do digits 1, 4, 7, or 8 appear?
 */
 pub fn part1() {
     let result: i32 = read_file_lines("input/08.txt")
+        .into_iter()
         .map(|line| {
             let mut parts = line.split(" | ");
             parts.next();
@@ -216,12 +217,10 @@ fn decode(digits: &mut Vec<String>) -> HashMap<char, usize> {
 
     segments[6].insert(diff);
     found.insert(diff);
-    let segment4 = *found
+    let segment4 = found
         .symmetric_difference(&all_chars)
         .cloned()
-        .collect::<Vec<char>>()
-        .get(0)
-        .unwrap();
+        .collect::<Vec<char>>()[0];
     segments[4].insert(segment4);
 
     let two = two_three_five
@@ -229,21 +228,17 @@ fn decode(digits: &mut Vec<String>) -> HashMap<char, usize> {
         .find(|digit| digit.contains(&segment4))
         .unwrap();
 
-    let segment2 = *two
+    let segment2 = two
         .intersection(&one)
         .cloned()
-        .collect::<Vec<char>>()
-        .get(0)
-        .unwrap();
+        .collect::<Vec<char>>()[0];
     segments[2] = HashSet::from([segment2]);
     segments[5].remove(&segment2);
 
-    let segment3 = *two
+    let segment3 = two
         .intersection(&segments[3])
         .cloned()
-        .collect::<Vec<char>>()
-        .get(0)
-        .unwrap();
+        .collect::<Vec<char>>()[0];
     segments[3] = HashSet::from([segment3]);
     segments[1].remove(&segment3);
 
@@ -277,7 +272,7 @@ pub fn part2() {
         (127, 8),
         (123, 9),
     ]);
-    let lines = read_file_lines("input/08.txt").map(|line| {
+    let lines = read_file_lines("input/08.txt").into_iter().map(|line| {
         let mut parts = line.split(" | ");
         (
             parts
@@ -300,9 +295,9 @@ pub fn part2() {
         sum + output.iter().enumerate().rev().fold(0, |acc, (i, digit)| {
             let mut lit = 0;
             digit.chars().for_each(|c| {
-                lit += 1 << (6 - decoded.get(&c).unwrap());
+                lit += 1 << (6 - decoded[&c]);
             });
-            let number = numbers.get(&lit).unwrap();
+            let number = numbers[&lit];
             acc + 10_i32.pow(3 - i as u32) * number
         })
     });

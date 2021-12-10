@@ -36,7 +36,7 @@ Use the binary numbers in your diagnostic report to calculate the gamma rate and
 */
 
 pub fn part1() {
-    let binaries: Vec<String> = read_file_lines("input/03.txt").collect();
+    let binaries: Vec<String> = read_file_lines("input/03.txt");
     let binary_len = binaries[0].len();
     let binaries_len = binaries.len();
     let mut ones_count = vec![0; binary_len];
@@ -144,7 +144,7 @@ fn reduce(binaries: &[&String], uses_ones: bool) -> i32 {
 }
 
 pub fn part2() {
-    let data: Vec<String> = read_file_lines("input/03.txt").collect();
+    let data: Vec<String> = read_file_lines("input/03.txt");
     let binaries: Vec<&String> = data.iter().collect();
 
     let oxygen_rate = reduce(&binaries, true);

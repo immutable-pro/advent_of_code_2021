@@ -36,9 +36,7 @@ Determine the horizontal position that the crabs can align to using the least fu
 */
 
 pub fn part1() {
-    let mut crabs_positions = read_file_lines("input/07.txt")
-        .next()
-        .unwrap()
+    let mut crabs_positions = read_file_lines("input/07.txt")[0]
         .split(',')
         .map(|x| x.parse().unwrap())
         .collect::<Vec<i32>>();
@@ -77,9 +75,7 @@ Determine the horizontal position that the crabs can align to using the least fu
 
 pub fn part2() {
     let mut positions_sum: i32 = 0;
-    let crabs_positions = read_file_lines("input/07.txt")
-        .next()
-        .unwrap()
+    let crabs_positions = read_file_lines("input/07.txt")[0]
         .split(',')
         .map(|x| {
             let val = x.parse().unwrap();

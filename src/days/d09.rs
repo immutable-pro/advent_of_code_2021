@@ -24,6 +24,7 @@ fn get_neighbors((x, y): (i16, i16), map: &[Vec<i16>]) -> Vec<(i16, i16)> {
 
 pub fn part1() {
     let map = read_file_lines("input/09.txt")
+        .iter()
         .map(|row| {
             row.chars()
                 .map(|c| c.to_string().parse().unwrap())
@@ -76,6 +77,7 @@ fn get_neighbors_but_9((x, y): (i16, i16), map: &[Vec<i16>]) -> Vec<(i16, i16)> 
 
 pub fn part2() {
     let map = read_file_lines("input/09.txt")
+        .iter()
         .map(|row| {
             row.chars()
                 .map(|c| c.to_string().parse().unwrap())
@@ -108,7 +110,11 @@ pub fn part2() {
     }
 
     sizes.sort_unstable();
-    let result: i32 = sizes.iter().rev().take(3).fold(1, |acc, v| acc * (*v as i32));
+    let result: i32 = sizes
+        .iter()
+        .rev()
+        .take(3)
+        .fold(1, |acc, v| acc * (*v as i32));
 
     println!("Day 09 > Part 2: {}", result);
 }

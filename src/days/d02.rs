@@ -39,20 +39,29 @@ pub fn part1() {
     let mut depth_pos: i32 = 0;
 
     read_file_lines("input/02.txt")
+        .iter()
         .for_each(|instruction| {
             let mut chunks = instruction.split_whitespace();
             let instruction = chunks.next().unwrap();
             let amount: i32 = chunks.next().unwrap().parse().unwrap();
             match instruction {
-                "forward" => { hor_pos += amount; },
-                "down" => { depth_pos += amount; },
-                "up" => { depth_pos -= amount; },
-                _ => { println!("Weird instruction found") }
+                "forward" => {
+                    hor_pos += amount;
+                }
+                "down" => {
+                    depth_pos += amount;
+                }
+                "up" => {
+                    depth_pos -= amount;
+                }
+                _ => {
+                    println!("Weird instruction found")
+                }
             }
         });
 
-        println!("Day 02 > Part 1: {}", hor_pos * depth_pos);
-    }
+    println!("Day 02 > Part 1: {}", hor_pos * depth_pos);
+}
 
 /*
 Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
@@ -87,17 +96,27 @@ pub fn part2() {
     let mut aim: i32 = 0;
 
     read_file_lines("input/02.txt")
+        .iter()
         .for_each(|instruction| {
             let mut chunks = instruction.split_whitespace();
             let instruction = chunks.next().unwrap();
             let amount: i32 = chunks.next().unwrap().parse().unwrap();
             match instruction {
-                "forward" => { hor_pos += amount; depth_pos += amount * aim; },
-                "down" => { aim += amount; },
-                "up" => { aim -= amount; },
-                _ => { println!("Weird instruction found") }
+                "forward" => {
+                    hor_pos += amount;
+                    depth_pos += amount * aim;
+                }
+                "down" => {
+                    aim += amount;
+                }
+                "up" => {
+                    aim -= amount;
+                }
+                _ => {
+                    println!("Weird instruction found")
+                }
             }
         });
 
-        println!("Day 02 > Part 2: {}", hor_pos * depth_pos);
+    println!("Day 02 > Part 2: {}", hor_pos * depth_pos);
 }
