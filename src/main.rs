@@ -17,6 +17,8 @@ fn main() {
     // d07::part2();
     // d08::part1();
     // d08::part2();
-    d09::part1();
-    d09::part2();
+    // d09::part1();
+    // d09::part2();
+    d10::part1();
+    d10::part2();
 }
