@@ -102,29 +102,7 @@ start-RW
 
 How many paths through this cave system are there that visit small caves at most once?
 */
-fn is_small_cave(cave: &str) -> bool {
-    cave.to_lowercase().eq(cave)
-}
-
-fn visit(from: &str, segments: &HashMap::<String, Vec<String>>, small_visited: &mut HashSet::<String>) -> i32 {
-    if from.eq("end") {
-        1
-    } else if small_visited.contains(&from.to_string()) {
-        0
-    } else {
-        if is_small_cave(from) {
-            small_visited.insert(from.to_string());
-        }
-        let mut count = 0;
-        for to in &segments[from] {
-            count += visit(to, segments, small_visited)
-        }
-        small_visited.remove(&from.to_string());
-        count
-    }
-}
-
-pub fn part1() {
+fn parse_segments() -> HashMap<String, Vec<String>> {
     let mut segments = HashMap::<String, Vec<String>>::new();
     read_file_lines("input/12.txt").iter().for_each(|line| {
         let mut chunks = line.split('-');
@@ -140,9 +118,124 @@ pub fn part1() {
         .push(from.to_string());
     });
 
-    let count = visit("start", &segments, &mut HashSet::<String>::new());
+    segments
+}
 
+fn is_small_cave(cave: &str) -> bool {
+    cave.to_lowercase().eq(cave)
+}
+
+fn visit(
+    from: &str,
+    segments: &HashMap<String, Vec<String>>,
+    small_visited: &mut HashSet<String>,
+) -> i32 {
+    if from.eq("end") {
+        1
+    } else if small_visited.contains(&from.to_string()) {
+        0
+    } else {
+        if is_small_cave(from) {
+            small_visited.insert(from.to_string());
+        }
+        let mut count = 0;
+        for to in &segments[from] {
+            if !to.eq("start") {
+                count += visit(to, segments, small_visited)
+            }
+        }
+        small_visited.remove(&from.to_string());
+        count
+    }
+}
+
+pub fn part1() {
+    let segments = parse_segments();
+    let count = visit("start", &segments, &mut HashSet::<String>::new());
     println!("Day 12 > Part 1: {}", count);
 }
 
-pub fn part2() {}
+/*
+After reviewing the available paths, you realize you might have time to visit a single small cave twice. Specifically, big caves can be visited any number of times, a single small cave can be visited at most twice, and the remaining small caves can be visited at most once. However, the caves named start and end can only be visited exactly once each: once you leave the start cave, you may not return to it, and once you reach the end cave, the path must end immediately.
+
+Now, the 36 possible paths through the first example above are:
+
+start,A,b,A,b,A,c,A,end
+start,A,b,A,b,A,end
+start,A,b,A,b,end
+start,A,b,A,c,A,b,A,end
+start,A,b,A,c,A,b,end
+start,A,b,A,c,A,c,A,end
+start,A,b,A,c,A,end
+start,A,b,A,end
+start,A,b,d,b,A,c,A,end
+start,A,b,d,b,A,end
+start,A,b,d,b,end
+start,A,b,end
+start,A,c,A,b,A,b,A,end
+start,A,c,A,b,A,b,end
+start,A,c,A,b,A,c,A,end
+start,A,c,A,b,A,end
+start,A,c,A,b,d,b,A,end
+start,A,c,A,b,d,b,end
+start,A,c,A,b,end
+start,A,c,A,c,A,b,A,end
+start,A,c,A,c,A,b,end
+start,A,c,A,c,A,end
+start,A,c,A,end
+start,A,end
+start,b,A,b,A,c,A,end
+start,b,A,b,A,end
+start,b,A,b,end
+start,b,A,c,A,b,A,end
+start,b,A,c,A,b,end
+start,b,A,c,A,c,A,end
+start,b,A,c,A,end
+start,b,A,end
+start,b,d,b,A,c,A,end
+start,b,d,b,A,end
+start,b,d,b,end
+start,b,end
+
+The slightly larger example above now has 103 paths through it, and the even larger example now has 3509 paths through it.
+
+Given these new rules, how many paths through this cave system are there?
+*/
+
+fn visit_2(
+    from: &str,
+    segments: &HashMap<String, Vec<String>>,
+    small_visited: &mut HashMap<String, i8>,
+) -> i32 {
+    if from.eq("end") {
+        1
+    } else if small_visited.contains_key(&from.to_string())
+        && small_visited.iter().any(|(_, v)| *v > 1)
+    {
+        0
+    } else {
+        if is_small_cave(from) {
+            *small_visited.entry(from.to_string()).or_insert(0) += 1;
+        }
+        let mut count = 0;
+        for to in &segments[from] {
+            if !to.eq("start") {
+                count += visit_2(to, segments, small_visited)
+            }
+        }
+        if small_visited.contains_key(from) {
+            if small_visited[from] > 1 {
+                *small_visited.get_mut(from).unwrap() -= 1;
+            } else {
+                small_visited.remove(&from.to_string());
+            }
+        }
+        count
+    }
+}
+
+pub fn part2() {
+    let segments = parse_segments();
+    let count = visit_2("start", &segments, &mut HashMap::<String, i8>::new());
+    println!("Day 12 > Part 2: {}", count);
+}
