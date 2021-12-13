@@ -1,5 +1,5 @@
 use crate::utils::read_file_lines;
-use std::collections::HashMap;
+use crate::utils::print_matrix;
 use std::collections::HashSet;
 
 /*
@@ -114,7 +114,8 @@ How many dots are visible after completing just the first fold instruction on yo
 */
 
 #[allow(clippy::single_char_pattern)]
-pub fn part1() {
+#[allow(clippy::type_complexity)]
+fn parse_instructions() -> (HashSet<(usize, usize)>, Vec<(String, usize)>) {
     let mut dots = HashSet::<(usize, usize)>::new();
     let mut instructions = Vec::<(String, usize)>::new();
     let mut dots_done = false;
@@ -141,9 +142,11 @@ pub fn part1() {
         };
     });
 
-    let (axis, pos) = &instructions[0];
-    dots = dots
-        .iter()
+    (dots, instructions)
+}
+
+fn fold(dots: HashSet<(usize, usize)>, axis: &str, pos: &usize) -> HashSet<(usize, usize)> {
+    dots.iter()
         .map(|(x, y)| {
             let reflected: (usize, usize);
             if axis.eq("x") {
@@ -153,19 +156,44 @@ pub fn part1() {
                 } else {
                     reflected = (*x, *y);
                 }
+            } else if y >= pos {
+                let d = y - pos;
+                reflected = (*x, pos - d);
             } else {
-                if y >= pos {
-                    let d = y - pos;
-                    reflected = (*x, pos - d);
-                } else {
-                    reflected = (*x, *y);
-                }
+                reflected = (*x, *y);
             }
             reflected
         })
-        .collect();
-
-    println!("Day 13 > Part 1: {:?}", dots.len());
+        .collect()
 }
 
-pub fn part2() {}
+pub fn part1() {
+    let (dots, instructions) = parse_instructions();
+    let (axis, pos) = &instructions[0];
+    println!("Day 13 > Part 1: {:?}", fold(dots, axis, pos).len());
+}
+
+/*
+Finish folding the transparent paper according to the instructions. The manual says the code is always eight capital letters.
+
+What code do you use to activate the infrared thermal imaging camera system?
+*/
+
+pub fn part2() {
+    let (mut dots, instructions) = parse_instructions();
+
+    for (axis, pos) in &instructions {
+        dots = fold(dots, axis, pos);
+    }
+
+    let max_x = dots.iter().map(|(x, _)| x).max().unwrap();
+    let max_y = dots.iter().map(|(_, y)| y).max().unwrap();
+
+    let mut matrix = vec![vec![' '; *max_x + 1]; *max_y + 1];
+    for (x, y) in &dots {
+        matrix[*y][*x] = 'X';
+    }
+
+    println!("Day 13 > Part 2");
+    print_matrix(&matrix);
+}
