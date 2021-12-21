@@ -6,8 +6,15 @@ version = 3
 name = "advent_of_code_2021"
 version = "0.1.0"
 dependencies = [
+ "bitstream-io",
  "comparator",
 ]
+
+[[package]]
+name = "bitstream-io"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "614aa3f2bac03707e62a84d18a48dd3d9ea6171313fd5e6a53b5054d8ae74601"
 
 [[package]]
 name = "comparator"
