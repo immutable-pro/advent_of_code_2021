@@ -99,14 +99,12 @@ To begin, get your puzzle input.
 */
 type Reader<'a> = BitReader<&'a mut Cursor<&'a Vec<u8>>, BigEndian>;
 
-fn parse_literal(reader: &mut Reader) -> i32 {
-    let mut consumed = 0_i32;
-    let mut chunks = Vec::<u64>::new();
+fn parse_literal(reader: &mut Reader) -> i64 {
+    let mut chunks = Vec::<i64>::new();
 
     loop {
         let delimiter: u8 = reader.read(1).unwrap();
         chunks.push(reader.read(4).unwrap());
-        consumed += 5;
         if delimiter == 0 {
             break;
         }
@@ -116,75 +114,86 @@ fn parse_literal(reader: &mut Reader) -> i32 {
         .iter()
         .rev()
         .enumerate()
-        .fold(0_u64, |acc, (i, chunk)| acc | chunk << (i * 4));
+        .fold(0_i64, |acc, (i, chunk)| acc | chunk << (i * 4));
 
-    println!("Number: {}", number);
-    consumed
+    number
 }
 
-fn parse_operation(reader: &mut Reader, versions: &mut Vec<u32>) -> i32 {
-    let mut consumed = 0_i32;
-    let length_type_id;
-    match reader.read::<u8>(1) {
-        Ok(t) => {
-            length_type_id = t;
-        }
-        Err(_) => {
-            return 0;
+fn fold(literals: &mut Vec<i64>, operation: u8) {
+    let result: i64;
+    match operation {
+        0 => result = literals.iter().sum(),
+        1 => result = literals.iter().product(),
+        2 => result = *literals.iter().min().unwrap(),
+        3 => result = *literals.iter().max().unwrap(),
+        5 => result = if literals[0] > literals[1] { 1 } else { 0 },
+        6 => result = if literals[0] < literals[1] { 1 } else { 0 },
+        7 => result = if literals[0] == literals[1] { 1 } else { 0 },
+        _ => {
+            println!("Unexpected operation id {}", operation);
+            result = 0
         }
     }
-    consumed += 1;
+    literals.clear();
+    literals.push(result);
+}
+
+fn parse_operation(reader: &mut Reader, versions: &mut Vec<u32>, id: u8, results: &mut Vec<i64>) {
+    let length_type_id;
+    match reader.read::<u8>(1) {
+        Ok(t) => length_type_id = t,
+        Err(_) => return,
+    }
+    let mut literals = Vec::<i64>::new();
     match length_type_id {
         0 => {
             let length;
-            match reader.read::<i32>(15) {
-                Ok(t) => {
-                    length = t;
-                }
-                Err(_) => {
-                    return 0;
-                }
+            match reader.read::<u32>(15) {
+                Ok(t) => length = t,
+                Err(_) => return,
             }
-            consumed += 15;
-            parse_packet(reader, length, versions);
-            consumed += length;
+            let mut sub_packet = Vec::<u8>::new();
+            for _ in 0..(length / 8) {
+                sub_packet.push(reader.read(8).unwrap());
+            }
+            if length % 8 != 0 {
+                let byte: u8 = reader.read::<u8>(length % 8).unwrap();
+                sub_packet.push(byte << (8 - (length % 8)));
+            }
+            let mut cursor = Cursor::new(&sub_packet);
+            let mut sub_packet_reader = BitReader::endian(&mut cursor, BigEndian);
+            parse_packet(&mut sub_packet_reader, versions, &mut literals, true);
         }
         1 => {
-            let _sub_packets: i16 = reader.read(11).unwrap();
-            parse_packet(reader, -1, versions);
+            let sub_packets: i16 = reader.read(11).unwrap();
+            for _ in 0..sub_packets {
+                parse_packet(reader, versions, &mut literals, false);
+            }
         }
         _ => {}
     }
-    consumed
+    fold(&mut literals, id);
+    results.push(literals[0]);
 }
 
-fn parse_packet(reader: &mut Reader, length: i32, versions: &mut Vec<u32>) {
-    let mut remaining = length;
+fn parse_packet(reader: &mut Reader, versions: &mut Vec<u32>, results: &mut Vec<i64>, consume: bool) {
     match reader.read::<u32>(3) {
-        Ok(version) => {
-            versions.push(version);
-        }
-        Err(_) => {
-            return;
-        }
+        Ok(version) => versions.push(version),
+        Err(_) => return, // End of stream
     }
     let type_id;
     match reader.read::<u8>(3) {
-        Ok(t) => {
-            type_id = t;
-        }
-        Err(_) => {
-            return;
-        }
+        Ok(t) => type_id = t,
+        Err(_) => return, // End of stream
     }
-    remaining -= 6;
-    let consumed = match type_id {
-        4 => parse_literal(reader),
-        _ => parse_operation(reader, versions),
+    match type_id {
+        4 => results.push(parse_literal(reader)),
+        id => {
+            parse_operation(reader, versions, id, results);
+        }
     };
-    remaining -= consumed;
-    if remaining > 0 {
-        parse_packet(reader, remaining, versions);
+    if consume {
+        parse_packet(reader, versions, results, true)
     }
 }
 
@@ -198,21 +207,19 @@ pub fn part1() {
     let mut input = Vec::<u8>::new();
     while let Some(first) = tmp_iter.next() {
         match tmp_iter.next() {
-            Some(second) => {
-                input.push(first << 4 | second);
-            }
-            None => {
-                input.push(first << 4);
-            }
+            Some(second) => input.push(first << 4 | second),
+            None => input.push(first << 4),
         }
     }
 
     let mut cursor = Cursor::new(&input);
     let mut reader = BitReader::endian(&mut cursor, BigEndian);
     let mut versions = Vec::<u32>::new();
-    parse_packet(&mut reader, (tmp.len() * 4) as i32, &mut versions);
+    let mut results = Vec::<i64>::new();
+    parse_packet(&mut reader, &mut versions, &mut results, false);
 
     println!("Day 16 > Part 1: {}", versions.into_iter().sum::<u32>());
+    println!("Day 16 > Part 2: {}", results[0]);
 }
 
 /*
@@ -244,4 +251,6 @@ For example:
 What do you get if you evaluate the expression represented by your hexadecimal-encoded BITS transmission?
 */
 
-pub fn part2() {}
+pub fn part2() {
+    // Solved in part1()
+}
