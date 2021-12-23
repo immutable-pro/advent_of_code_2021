@@ -31,6 +31,8 @@ fn main() {
     // d14::part2();
     // d15::part1();
     // d15::part2();
-    d16::part1();
-    d16::part2();
+    // d16::part1();
+    // d16::part2();
+    d17::part1();
+    d17::part2();
 }
