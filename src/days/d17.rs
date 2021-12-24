@@ -1,6 +1,5 @@
 use crate::utils::read_file_lines;
 use regex::Regex;
-use std::collections::HashMap;
 
 /*
 You finally decode the Elves' message. HI, the message says. You continue searching for the sleigh keys.
@@ -112,12 +111,49 @@ Find the initial velocity that causes the probe to reach the highest y position 
 
 pub fn part1() {
     let target_area_input = &read_file_lines("input/17.txt")[0];
+    let re = Regex::new(r"^target area: x=(\d+)..(\d+), y=(-?\d+)..(-?\d+)$").unwrap();
+    let mut y1: i32 = 0;
+    for cap in re.captures_iter(target_area_input) {
+        y1 = cap[3].parse().unwrap();
+    }
+
+    let n = -y1 - 1;
+    let max_height = n * (n + 1) / 2;
+    println!("Day 17 > Part 1: {}", max_height);
+}
+
+/*
+Maybe a fancy trick shot isn't the best idea; after all, you only have one probe, so you had better not miss.
+
+To get the best idea of what your options are for launching the probe, you need to find every initial velocity that causes the probe to eventually be within the target area after any step.
+
+In the above example, there are 112 different initial velocity values that meet these criteria:
+
+23,-10  25,-9   27,-5   29,-6   22,-6   21,-7   9,0     27,-7   24,-5
+25,-7   26,-6   25,-5   6,8     11,-2   20,-5   29,-10  6,3     28,-7
+8,0     30,-6   29,-8   20,-10  6,7     6,4     6,1     14,-4   21,-6
+26,-10  7,-1    7,7     8,-1    21,-9   6,2     20,-7   30,-10  14,-3
+20,-8   13,-2   7,3     28,-8   29,-9   15,-3   22,-5   26,-8   25,-8
+25,-6   15,-4   9,-2    15,-2   12,-2   28,-9   12,-3   24,-6   23,-7
+25,-10  7,8     11,-3   26,-7   7,1     23,-9   6,0     22,-10  27,-6
+8,1     22,-8   13,-4   7,6     28,-6   11,-4   12,-4   26,-9   7,4
+24,-10  23,-8   30,-8   7,0     9,-1    10,-1   26,-5   22,-9   6,5
+7,5     23,-6   28,-10  10,-2   11,-1   20,-9   14,-2   29,-7   13,-3
+23,-5   24,-8   27,-9   30,-7   28,-5   21,-10  7,9     6,6     21,-5
+27,-10  7,2     30,-9   21,-8   22,-7   24,-9   20,-6   6,9     29,-5
+8,-2    27,-8   30,-5   24,-7
+
+How many distinct initial velocity values cause the probe to be within the target area after any step?
+*/
+
+pub fn part2() {
+    let target_area_input = &read_file_lines("input/17.txt")[0];
     // target area: x=20..30, y=-10..-5
     let re = Regex::new(r"^target area: x=(\d+)..(\d+), y=(-?\d+)..(-?\d+)$").unwrap();
-    let mut x1: i16 = 0;
-    let mut x2: i16 = 0;
-    let mut y1: i16 = 0;
-    let mut y2: i16 = 0;
+    let mut x1: i32 = 0;
+    let mut x2: i32 = 0;
+    let mut y1: i32 = 0;
+    let mut y2: i32 = 0;
     for cap in re.captures_iter(target_area_input) {
         x1 = cap[1].parse().unwrap();
         x2 = cap[2].parse().unwrap();
@@ -125,32 +161,29 @@ pub fn part1() {
         y2 = cap[4].parse().unwrap();
     }
 
-    // let mut valid_v_x = HashMap::<i16, usize>::new();
-    // let min_x_speed = 1 + ((-1 + ((1 + 8 * x1) as f32).sqrt() as i16) / 2);
-    // let valid_end_range = x1..=x2;
-    // let mut max_x_steps_count = i16::MIN;
-    // let mut max_steps_x_vel = -1;
-    // for v in (min_x_speed..x1).rev() {
-    //     let mut reach = v;
-    //     for i in (1..v).rev() {
-    //         reach += i;
-    //         if valid_end_range.contains(&reach) {
-    //             valid_v_x.insert(v, (v - i + 1) as usize);
-    //             if (v - i + 1) > max_x_steps_count {
-    //                 max_x_steps_count = v - i + 1;
-    //                 max_steps_x_vel = v;
-    //             }
-    //             break;
-    //         }
-    //         if reach > x2 {
-    //             break;
-    //         }
-    //     }
-    // }
+    let mut count = 0;
+    for initial_y in y1..100 {
+        for initial_x in 0..=x2 {
+            let mut x = 0_i32;
+            let mut y = 0_i32;
+            let mut dy = initial_y;
+            let mut dx = initial_x;
 
-    let n = -y1 - 1;
-    let max_height = n * (n + 1) / 2;
-    println!("Day 17 > Part 1: {}", max_height);
+            while y >= y1 {
+                y += dy;
+                x += dx;
+                dy -= 1;
+                if dx > 0 {
+                    dx -= 1;
+                }
+
+                if (x1..=x2).contains(&x) && (y1..=y2).contains(&y) {
+                    count += 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    println!("Day 17 > Part 2: {}", count);
 }
-
-pub fn part2() {}
