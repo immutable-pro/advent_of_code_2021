@@ -169,9 +169,8 @@ struct Snailfish {
   depth: i8,
 }
 
-fn print(l: &[Snailfish]) {
+fn _print(l: &[Snailfish]) {
   l.iter().for_each(|s| print!("({},d{}),", s.value, s.depth));
-  // l.iter().for_each(|s| print!("{},", s.value));
   println!()
 }
 
@@ -261,9 +260,6 @@ fn reduce(l: &mut Vec<Snailfish>) {
   }
 }
 
-/**
- * The magnitude of a pair is 3 times the magnitude of its left element plus 2 times the magnitude of its right element. The magnitude of a regular number is just that number.
- */
 fn final_sum(l: &mut Vec<Snailfish>) -> u32 {
   let mut depth = 3;
   while depth >= 0 {
@@ -300,10 +296,59 @@ pub fn part1() {
   let mut result = lines.pop().unwrap();
   reduce(&mut result);
 
-  println!("Result:");
-  print(&result);
+  // println!("Result:");
+  // print(&result);
 
   println!("Day 18 > Part 1: {}", final_sum(&mut result));
 }
+/*
+You notice a second question on the back of the homework assignment:
 
-pub fn part2() {}
+What is the largest magnitude you can get from adding only two of the snailfish numbers?
+
+Note that snailfish addition is not commutative - that is, x + y and y + x can produce different results.
+
+Again considering the last example homework assignment above:
+
+[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+[[[5,[2,8]],4],[5,[[9,9],0]]]
+[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+[[[[5,4],[7,7]],8],[[8,3],8]]
+[[9,3],[[9,9],[6,[4,9]]]]
+[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
+
+The largest magnitude of the sum of any two snailfish numbers in this list is 3993. This is the magnitude of [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]] + [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]], which reduces to [[[[7,8],[6,6]],[[6,0],[7,7]]],[[[7,8],[8,8]],[[7,9],[0,6]]]].
+
+What is the largest magnitude of any sum of two different snailfish numbers from the homework assignment?
+*/
+pub fn part2() {
+  let lines: Vec<Vec<Snailfish>> = read_file_lines("input/18.txt")
+    .iter()
+    .map(|pair| parse(pair))
+    .collect();
+
+  let mut largest_magnitude = u32::MIN;
+
+  for i in 0..lines.len() {
+    for j in 0..lines.len() {
+      if j == i {
+        continue;
+      }
+      let s1 = &lines[i];
+      let s2 = &lines[j];
+      let mut snailfish = add(&s1, &s2);
+      reduce(&mut snailfish);
+      let magnitude = final_sum(&mut snailfish);
+      if magnitude > largest_magnitude {
+        largest_magnitude = magnitude;
+      }
+    } 
+  }
+
+
+  println!("Day 18 > Part 2: {}", largest_magnitude);
+}
