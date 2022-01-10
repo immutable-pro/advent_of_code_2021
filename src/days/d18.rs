@@ -340,7 +340,7 @@ pub fn part2() {
       }
       let s1 = &lines[i];
       let s2 = &lines[j];
-      let mut snailfish = add(&s1, &s2);
+      let mut snailfish = add(s1, s2);
       reduce(&mut snailfish);
       let magnitude = final_sum(&mut snailfish);
       if magnitude > largest_magnitude {
