@@ -260,7 +260,7 @@ fn reduce(l: &mut Vec<Snailfish>) {
   }
 }
 
-fn final_sum(l: &mut Vec<Snailfish>) -> u32 {
+fn calculate_magnitude(l: &mut Vec<Snailfish>) -> u32 {
   let mut depth = 3;
   while depth >= 0 {
     let idx = l
@@ -299,7 +299,7 @@ pub fn part1() {
   // println!("Result:");
   // print(&result);
 
-  println!("Day 18 > Part 1: {}", final_sum(&mut result));
+  println!("Day 18 > Part 1: {}", calculate_magnitude(&mut result));
 }
 /*
 You notice a second question on the back of the homework assignment:
@@ -342,13 +342,12 @@ pub fn part2() {
       let s2 = &lines[j];
       let mut snailfish = add(s1, s2);
       reduce(&mut snailfish);
-      let magnitude = final_sum(&mut snailfish);
+      let magnitude = calculate_magnitude(&mut snailfish);
       if magnitude > largest_magnitude {
         largest_magnitude = magnitude;
       }
-    } 
+    }
   }
-
 
   println!("Day 18 > Part 2: {}", largest_magnitude);
 }
