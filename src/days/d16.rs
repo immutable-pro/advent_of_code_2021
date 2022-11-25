@@ -120,38 +120,35 @@ fn parse_literal(reader: &mut Reader) -> i64 {
 }
 
 fn fold(literals: &mut Vec<i64>, operation: u8) {
-    let result: i64;
-    match operation {
-        0 => result = literals.iter().sum(),
-        1 => result = literals.iter().product(),
-        2 => result = *literals.iter().min().unwrap(),
-        3 => result = *literals.iter().max().unwrap(),
-        5 => result = if literals[0] > literals[1] { 1 } else { 0 },
-        6 => result = if literals[0] < literals[1] { 1 } else { 0 },
-        7 => result = if literals[0] == literals[1] { 1 } else { 0 },
+    let result: i64 = match operation {
+        0 => literals.iter().sum(),
+        1 => literals.iter().product(),
+        2 => *literals.iter().min().unwrap(),
+        3 => *literals.iter().max().unwrap(),
+        5 => if literals[0] > literals[1] { 1 } else { 0 },
+        6 => if literals[0] < literals[1] { 1 } else { 0 },
+        7 => if literals[0] == literals[1] { 1 } else { 0 },
         _ => {
             println!("Unexpected operation id {}", operation);
-            result = 0
+            0
         }
-    }
+    };
     literals.clear();
     literals.push(result);
 }
 
 fn parse_operation(reader: &mut Reader, versions: &mut Vec<u32>, id: u8, results: &mut Vec<i64>) {
-    let length_type_id;
-    match reader.read::<u8>(1) {
-        Ok(t) => length_type_id = t,
+    let length_type_id = match reader.read::<u8>(1) {
+        Ok(t) => t,
         Err(_) => return,
-    }
+    };
     let mut literals = Vec::<i64>::new();
     match length_type_id {
         0 => {
-            let length;
-            match reader.read::<u32>(15) {
-                Ok(t) => length = t,
+            let length  = match reader.read::<u32>(15) {
+                Ok(t) => t,
                 Err(_) => return,
-            }
+            };
             let mut sub_packet = Vec::<u8>::new();
             for _ in 0..(length / 8) {
                 sub_packet.push(reader.read(8).unwrap());
@@ -181,11 +178,10 @@ fn parse_packet(reader: &mut Reader, versions: &mut Vec<u32>, results: &mut Vec<
         Ok(version) => versions.push(version),
         Err(_) => return, // End of stream
     }
-    let type_id;
-    match reader.read::<u8>(3) {
-        Ok(t) => type_id = t,
+    let type_id = match reader.read::<u8>(3) {
+        Ok(t) => t,
         Err(_) => return, // End of stream
-    }
+    };
     match type_id {
         4 => results.push(parse_literal(reader)),
         id => {

@@ -129,7 +129,7 @@ fn sweep<'a>(binaries: &[&'a String], pos: usize, use_ones: bool) -> Vec<&'a Str
 fn reduce(binaries: &[&String], uses_ones: bool) -> i32 {
     let binary_len = binaries[0].len();
     let mut index = 0;
-    let mut swept: Vec<&String> = binaries.iter().copied().collect();
+    let mut swept: Vec<&String> = binaries.to_vec();
     loop {
         swept = sweep(&swept, index, uses_ones);
         if swept.len() == 1 {
