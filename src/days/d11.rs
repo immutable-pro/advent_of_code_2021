@@ -336,7 +336,7 @@ fn increase(octopuses: &mut Vec<Vec<i8>>) {
     }
 }
 
-fn flash(octopuses: &mut Vec<Vec<i8>>) {
+fn flash(octopuses: &mut [Vec<i8>]) {
     let mut flashed = HashSet::<(usize, usize)>::new();
     for i in 0..octopuses.len() {
         for j in 0..octopuses[0].len() {
